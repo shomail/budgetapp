@@ -59,7 +59,7 @@ const UIController = (function() {
       return {
         type: document.querySelector(DOMstrings.inputType).value,
         desc: document.querySelector(DOMstrings.inputDesc).value,
-        value: document.querySelector(DOMstrings.inputValue).value
+        value: parseFloat(document.querySelector(DOMstrings.inputValue).value)
       };
     },
 
@@ -101,13 +101,13 @@ const UIController = (function() {
     clearFields: function() {
       const fields = document.querySelectorAll(DOMstrings.inputDesc + ', ' + DOMstrings.inputValue);
 
-      const filedsArr = Array.prototype.slice.call(fields);
+      const fieldsArr = Array.prototype.slice.call(fields);
 
-      filedsArr.foreach(function(elem) {
+      fieldsArr.forEach(function(elem) {
         elem.value = '';
       });
 
-      filedsArr[0].focus();
+      fieldsArr[0].focus();
     },
 
     getDOMStrings: function() {
@@ -129,14 +129,20 @@ const controller = (function(budgetCtrl, UICtrl) {
     });
   };
 
+  const updateBudget = function() {};
+
   const ctrlAddItem = function() {
     const input = UICtrl.getInput();
+
+    if (input.desc === '' || isNaN(input.value) || input.value === 0) return false;
 
     const newItem = budgetCtrl.addItems(input.type, input.desc, input.value);
 
     UICtrl.addListItem(newItem, input.type);
 
     UICtrl.clearFields();
+
+    updateBudget();
   };
 
   return {
