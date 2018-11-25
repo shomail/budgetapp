@@ -50,6 +50,18 @@ const budgetController = (function() {
       return item;
     },
 
+    deleteItem: function(type, id) {
+      const ids = data.allItems[type].map(function(curr) {
+        return curr.id;
+      });
+
+      const index = ids.indexOf(id);
+
+      if (index !== -1) {
+        data.allItems[type].splice(index, 1);
+      }
+    },
+
     calculateBudget: function() {
       calculateTotal('income');
       calculateTotal('expense');
@@ -87,7 +99,8 @@ const UIController = (function() {
     budgetLabel: '.budget__value',
     incomeLabel: '.budget__income--value',
     expenseLabel: '.budget__expenses--value',
-    percentLabel: '.budget__expenses--percentage'
+    percentLabel: '.budget__expenses--percentage',
+    container: '.container'
   };
 
   return {
@@ -134,6 +147,12 @@ const UIController = (function() {
       document.querySelector(className).insertAdjacentHTML('beforeend', html);
     },
 
+    deleteListItem: function(selectorId) {
+      const elem = document.getElementById(selectorId);
+
+      elem.parentNode.removeChild(elem);
+    },
+
     clearFields: function() {
       const fields = document.querySelectorAll(DOMstrings.inputDesc + ', ' + DOMstrings.inputValue);
 
@@ -170,6 +189,8 @@ const controller = (function(budgetCtrl, UICtrl) {
 
       ctrlAddItem();
     });
+
+    document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
   };
 
   const updateBudget = function() {
@@ -193,6 +214,22 @@ const controller = (function(budgetCtrl, UICtrl) {
     UICtrl.clearFields();
 
     updateBudget();
+  };
+
+  const ctrlDeleteItem = function(event) {
+    const itemId = event.target.parentNode.parentNode.parentNode.parentNode.id;
+
+    if (itemId) {
+      const splitId = itemId.split('-');
+      const type = splitId[0];
+      const id = parseInt(splitId[1], 10);
+
+      budgetCtrl.deleteItem(type, id);
+
+      UICtrl.deleteListItem(itemId);
+
+      updateBudget();
+    }
   };
 
   return {
